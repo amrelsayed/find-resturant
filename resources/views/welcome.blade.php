@@ -47,15 +47,13 @@
             </div>
             @endif
             
-            <form method="post" action="find-resturant">
-                @csrf
+            <form method="get" action="/">
                 <input type="text" name="meal_name" placeholder="Meal name"><br>
                 <input type="text" name="latitude" placeholder="Latitude"><br>
                 <input type="text" name="longitude" placeholder="Longitude"><br>
                 <input type="submit" value="find">
             </form>
-            @if (isset($resturnats))
-                @if (! empty($resturnats))
+            @if (count($resturnats) > 0)
                 <ul>
                     @foreach($resturnats as $resturant)
                     <li>
@@ -68,9 +66,8 @@
                     </li>
                     @endforeach
                 </ul>
-                @else
-                    <p>No result</p>
-                @endif
+            @else
+                <p>No result</p>
             @endif
         </div>
     </body>

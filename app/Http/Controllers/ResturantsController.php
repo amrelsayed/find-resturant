@@ -9,23 +9,24 @@ use Illuminate\Http\Request;
 
 class ResturantsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-    	return view('welcome');
-    }
+    	$resturnats = collect();
 
-    public function find(SearchResturants $request)
-    {
-    	$resturnats = Resturant::whereHas('meals', function(Builder $query) {
-    		$query->where('name', 'like', '%' . request('meal_name') . '%');
-    	})
-    	->selectRaw('name, recommendations, successful_orders,
-    		ST_DISTANCE(point(?, ?), point(latitude, longitude)) * 111195 as distance', [$request->latitude, $request->longitude])
-    	->orderBy('distance')
-    	->orderBy('recommendations', 'DESC')
-    	->orderBy('successful_orders', 'DESC')
-    	->limit(3)
-    	->get();
+    	if ($request->filled('meal_name') && 
+    		$request->filled('latitude') && 
+    		$request->filled('longitude')) {
+	    		$resturnats = Resturant::whereHas('meals', function(Builder $query) {
+	    		$query->where('name', 'like', '%' . request('meal_name') . '%');
+	    		})
+		    	->selectRaw('name, recommendations, successful_orders,
+		    		ST_DISTANCE(point(?, ?), point(latitude, longitude)) * 111195 as distance', [$request->latitude, $request->longitude])
+		    	->orderBy('distance')
+		    	->orderBy('recommendations', 'DESC')
+		    	->orderBy('successful_orders', 'DESC')
+		    	->limit(3)
+		    	->get();
+    	}
 
     	if (! empty($resturnats)) {
     		foreach ($resturnats as $resturnat) {

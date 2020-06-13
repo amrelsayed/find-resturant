@@ -14,4 +14,3 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'ResturantsController@index');
-Route::post('/find-resturant', 'ResturantsController@find');
