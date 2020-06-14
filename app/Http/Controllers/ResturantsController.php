@@ -20,14 +20,22 @@ class ResturantsController extends Controller
 	    		$query->where('name', 'like', '%' . request('meal_name') . '%');
 	    		})
 		    	->selectRaw('name, recommendations, successful_orders,
-		    		ST_DISTANCE(point(?, ?), point(latitude, longitude)) * 111195 as distance', [$request->latitude, $request->longitude])
-		    	->orderBy('distance')
-		    	->orderBy('recommendations', 'DESC')
-		    	->orderBy('successful_orders', 'DESC')
+		    		ST_DISTANCE(point(?, ?), point(latitude, longitude)) * 111195 as distance, 
+		    		(
+		    		((recommendations * 5) + (successful_orders * 5)) - 
+		    		((ST_DISTANCE(point(?, ?), point(latitude, longitude)) * 111195) * 10)
+		    		)  as rank',
+		    		[ 
+		    			$request->latitude, 
+		    			$request->longitude, 
+		    			$request->latitude, 
+		    			$request->longitude
+		    		])
+		    	->orderBy('rank', 'DESC')
 		    	->limit(3)
 		    	->get();
     	}
-
+    	
     	if (! empty($resturnats)) {
     		foreach ($resturnats as $resturnat) {
     			$resturnat->distance = $this->beautifyDistance($resturnat->distance);
